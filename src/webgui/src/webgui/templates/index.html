@@ -2,7 +2,7 @@
 <html>
 <head>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/cpu_helper.css') }}">
 <title>{{ sub.name }}</title>
 </head>
 <body>
@@ -16,11 +16,18 @@
     <!-- Example of how to create a row on the page -->
     <div class="row">
       <div class="col-md-4">
-        <h3 class="text-center">Left Camera</h3>
+            <h3 class="text-center">Left Camera</h3>
+              <div class = "row">
+                  <h3 clas= "cpu_info">CPU Usage Info</h3>
+                  <p id="cpu_info_display"></p>
+                  <div id = "cpu_usage_bar"></div>
+              </div>
       </div>
+        
       <div class="col-md-4">
         <h3 class="text-center">Right Camera</h3>
       </div>
+        
       <div class="col-md-4">
         <h3 class="text-center">Bottom Camera</h3>
       </div>
@@ -33,5 +40,41 @@
 
 <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+    // var socket = io.connect('http://' + document.domain + ':' + location.port);
+    // socket.on('connect', function() {
+    //     socket.emit('my event', {data: 'I\'m connected!'});
+    // });
+    
+    // socket.on("CPU_INFO", function(msg){
+    //     console.log(msg);
+    //     var total_usage = sum(msg);
+    //     update_cpu_usage_bar(total_usage);
+    // })
+
+    function update_cpu_usage_bar( usage ){
+      var elem = document.getElementById("cpu_usage_bar");
+      var width = 1;
+      width = usage;
+      elem.style.width = width + '%';
+    }
+
+    function loadDoc() {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        usage = this.responseText;
+        console.log("works");
+        console.log(usage);
+        //usage = 15
+        update_cpu_usage_bar( usage );
+      };
+      xhttp.open("GET", '/cpu', true);
+      xhttp.send();
+    }
+
+  var change = setInterval(loadDoc, 10);
+
+</script>
 </body>
 </html>

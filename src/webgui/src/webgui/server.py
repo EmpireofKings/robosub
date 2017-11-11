@@ -6,8 +6,11 @@ import os
 import sys
 import rospkg
 import threading
+from flask_socketio import SocketIO, send, emit
+#from gevent import monkey
+import psutil
 
-
+#monkry.patch_all()
 class Sub:
     def __init__(self, name):
         self.name = name
@@ -20,11 +23,33 @@ sub = Sub('Enigma')
 # instance_path
 rp = rospkg.RosPack()
 app = Flask(__name__, instance_path=os.path.join(rp.get_path("webgui"), "src", "webgui"))
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
+
 
 
 @app.route("/")
 def index():
     return render_template('index.html', sub=sub)
+
+@app.route("/cpu")
+
+def cpu():
+    # threading.Timer(1.0,cpu).start()
+    cpu_info  =  psutil.cpu_percent(interval = 0.5, percpu=True)
+    return str(sum(cpu_info))
+
+
+
+# @socketio.on('CPU_INFO')
+# def refresh_cpu_usage_info():
+#     while (True):
+#         cpu_info  =  psutil.cpu_percent(interval = 0.5, percpu=True)
+#         return sum(cpu_info)
+        
+# def ack():
+#     print ('Massage was received')
+    
 
 # Sample callback for ROS to use
 def callback(data):
@@ -43,4 +68,9 @@ def main():
         rospy.Subscriber("testing2", String, callback)
     # We do not need to run rospy.spin() here because all rospy.spin does is
     # block until the node is supposed to be killed
-    app.run(host="0.0.0.0", debug=True)
+    #socketio.run(host="0.0.0.0", port = "5000", debug=True)
+
+    
+# if __name__ == '__main__':
+    #socketio.run(app, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

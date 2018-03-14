@@ -11,7 +11,7 @@ apt-get -qq update
 set -e
 
 # Install cuda 8.0
-apt-get -qq install -y cuda-toolkit-8-0
+apt-get -qq install -y cuda-toolkit-8-0 cuda-toolkit-9-1
 
 
 echo 'export PATH=/usr/local/cuda/bin:$PATH' >> /root/.bashrc

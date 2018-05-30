@@ -1,0 +1,4 @@
+<launch>
+  <arg name="output" default="screen" />
+  <node pkg="robosub" type="robosub_state_machine_node.py" name="task_manager" output="screen"/>
+</launch>

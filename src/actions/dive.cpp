@@ -23,13 +23,13 @@ class DiveAction {
     server_.registerGoalCallback(boost::bind(&DiveAction::goalCallback, this));
 
     // Register callback for when the current goal is cancelled
-    server_.registerPreemptCallback(
+      server_.registerPreemptCallback(
         boost::bind(&DiveAction::preemptCallback, this));
 
-    depth_sub_ = nh_.subscribe("/pose", 1, &DiveAction::poseCallback, this);
 
     // Node namespace makes this $(arg ns)/setpoint instead
-    depth_pub_ = nh_.advertise<std_msgs::Float64>("setpoint", 1);
+    depth_setpoint_pub_ = nh_.advertise<std_msgs::Float64>("setpoint", 1);
+    depth_pub_ = nh_.advertise<std_msgs::Float64>("state", 1);
     enable_pub_ = nh_.advertise<std_msgs::Bool>("pid_enable", 1);
 
     enable_pub_.publish(Bool(false));
@@ -43,12 +43,22 @@ class DiveAction {
   void goalCallback() {
     depth_ = server_.acceptNewGoal()->depth;
     ROS_INFO("%s: Received new depth goal %f", action_name_.c_str(), depth_);
+
+    //  Send setpoint to pid controller
+    std_msgs::Float64 setpoint;
+    setpoint.data = depth_;
+    depth_pub_.publish(setpoint);
+
+    // Enable the pid controller
     enable_pub_.publish(Bool(true));
+
+    depth_sub_ = nh_.subscribe("pose", 1, &DiveAction::poseCallback, this);
   }
 
   void preemptCallback() {
     ROS_INFO("%s: Preempted", action_name_.c_str());
     enable_pub_.publish(Bool(false));
+    depth_sub_.shutdown();
     server_.setPreempted();
   }
 
@@ -57,18 +67,23 @@ class DiveAction {
     robosub::DiveFeedback feedback;
     feedback.depth = depth;
     server_.publishFeedback(feedback);
-
+    ROS_INFO("State: %f, Setpoint: %f", depth, depth_);
     if (::fabs(depth_ - depth) < kTolerance) {
       ROS_INFO("%s: Succeeded", action_name_.c_str());
       robosub::DiveResult result;
       result.depth = depth;
       enable_pub_.publish(Bool(false));
+      depth_sub_.shutdown();
       server_.setSucceeded(result);
     } else {
       // Do PID control here by sending a setpoint to the PID node
       std_msgs::Float64 setpoint;
       setpoint.data = depth_;
-      depth_pub_.publish(setpoint);
+      depth_setpoint_pub_.publish(setpoint);
+
+      std_msgs::Float64 msg;
+      msg.data = depth;
+      depth_pub_.publish(msg);
     }
   }
 
@@ -79,6 +94,7 @@ class DiveAction {
   std::string action_name_;
   ros::Subscriber depth_sub_;
   ros::Publisher depth_pub_;
+  ros::Publisher depth_setpoint_pub_;
   ros::Publisher enable_pub_;
 };
 

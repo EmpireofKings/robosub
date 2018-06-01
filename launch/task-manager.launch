@@ -1,8 +1,5 @@
 <launch>
   <include file="$(find robosub)/launch/simulation/simulation_sensor_checks.launch"/>
   <include file="$(find robosub)/launch/simulation/simulation_dive.launch"/>
-
   <node pkg="topic_tools" type="transform" name="odom_to_pose" ns="dive" args="/rexrov/pose_gt pose geometry_msgs/Pose 'm.pose.pose'"/>
-
-
 </launch>

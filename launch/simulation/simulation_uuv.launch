@@ -1,7 +1,7 @@
 <launch>
   <!-- This is the launch file for running the robosub code on the uuv_simulator -->
-  <!-- Since the simualtor has its own controller we only need to post the angular velocity messages-->
-  <!-- to the simualtor. We dont need to use mavros for the uuv simulator.  -->
+  <!-- Since the simulator has its own controller we only need to post the angular velocity messages-->
+  <!-- to the simulator. We dont need to use mavros for the uuv simulator.  -->
 
   <!-- If you want to generate a ROS bag with the recorded simulated data, set this flag to true -->
   <arg name="record" default="false"/>

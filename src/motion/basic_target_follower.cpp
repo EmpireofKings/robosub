@@ -10,15 +10,8 @@
 
 BasicTargetFollower::BasicTargetFollower(float kSpeed, float kAlt, float kYaw)
     : kSpeed_(kSpeed), kAlt_(kAlt), kYaw_(kYaw) {
-  std::string velocity_topic = "/rexrov/cmd_vel";
-  // if (!ros::param::get("velocity_topic", velocity_topic)) {
-  //   throw ros::Exception("Must specify angular_position_topic parameter");
-  // }
-  // std::string velocity_topic;
-  // if (!ros::param::get("velocity_topic", velocity_topic)) {
-  //   throw ros::Exception("Must specify angular_position_topic parameter");
-  // }
 
+  std::string velocity_topic = "/robosub/target_twist";
   vel_pub_ = nh_.advertise<geometry_msgs::Twist>(velocity_topic, 1);
 }
 

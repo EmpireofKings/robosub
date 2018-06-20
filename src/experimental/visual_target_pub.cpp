@@ -1,7 +1,9 @@
 #include "ros/ros.h"
+#include <stdlib.h>     /* srand, rand */
 #include "robosub/VisualTarget.h"
-
 #include <sstream>
+
+/* This file is to test if the basic_target_follower works properly.*/
 
 int main(int argc, char **argv)
 {
@@ -13,24 +15,20 @@ int main(int argc, char **argv)
 
   ros::Rate loop_rate(10);
 
-  int count = 0;
+  int rand_target;
   while (ros::ok())
   {
     robosub::VisualTarget msg;
+    rand_target = rand() % 100 + 1;
 
-    msg.x = 10 + count;
-    msg.y = 50 - count;
-
+    // since our images are 480p
+    msg.x = 320 + rand_target;
+    msg.y = 240 - rand_target;
 
     target_pub.publish(msg);
-
     ros::spinOnce();
-
     loop_rate.sleep();
-    ++count;
+
   }
-
-
   return 0;
 }
-

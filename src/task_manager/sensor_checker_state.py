@@ -32,7 +32,7 @@ class Sensor_Checks(smach.State):
         if(self.sensor_check_complete):
             rospy.loginfo("Checks_passed")
             return 'Checks_passed'
-            
+
         else:
             rospy.loginfo("Checks_failed")
             return 'Checks_failed'
